@@ -1,0 +1,76 @@
+# -*- coding: utf-8 -*-
+"""
+Created on Thu Mar 23 08:43:31 2017
+
+@author: khoefle
+"""
+
+
+import Tkinter as tk
+import tkMessageBox
+import platform
+#import datetime
+import argparse
+import time
+
+
+
+if platform.system() == 'Windows':
+   import winsound
+   Windows = True;
+else:
+   import os
+   Windows = False;
+
+def ShowMessage(Message,d=0,f=0):
+    root = tk.Tk()
+    root.withdraw()
+    tkMessageBox.showwarning("Notification", Message)
+    try:
+        Beep(d,f)
+    except ValueError:
+        print "i am quiet..."
+        
+        
+def Beep(f,d):
+    if Windows:
+        winsound.Beep(f,d)
+    else:
+        os.system('play --no-show-progress --null --channels 1 synth %s sine %f' % ( f, d))
+
+
+def OpenWindow(d=0,f=0):
+    ShowMessage("Please Open Window!",d,f)
+
+def CloseWindow(d=0,f=0):
+    ShowMessage("Please Close Window!",d,f)
+
+
+
+parser = argparse.ArgumentParser()
+parser.add_argument("--quiet")
+args = parser.parse_args()
+print args.quiet
+
+
+start = time.time();
+op = False;
+
+while True:
+    now = time.time()
+    if now - start >= 3600 and not op:
+        if args.quiet:
+            OpenWindow();
+        else:
+            OpenWindow(1000,2000)
+        start_open = time.time();
+        start = time.time();
+        op = True;
+    
+    if op:
+        if now - start_open >= 300:
+            if args.quiet:
+                CloseWindow();
+            else:
+                CloseWindow(1500,2000)
+            op = False
